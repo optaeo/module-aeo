@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Optaeo\Aeo\Api\ReviewSummaryManagementInterface" type="Optaeo\Aeo\Model\ReviewSummaryManagement"/>
+    <preference for="Optaeo\Aeo\Api\Data\ReviewSummaryInterface" type="Optaeo\Aeo\Model\ReviewSummary"/>
+    <preference for="Optaeo\Aeo\Api\ShippingConfigManagementInterface" type="Optaeo\Aeo\Model\ShippingConfigManagement"/>
+    <preference for="Optaeo\Aeo\Api\WebhookConfigManagementInterface" type="Optaeo\Aeo\Model\WebhookConfigManagement"/>
+    <preference for="Optaeo\Aeo\Api\Data\ShippingConfigInterface" type="Optaeo\Aeo\Model\ShippingConfig"/>
+    <preference for="Optaeo\Aeo\Api\Data\ShippingCarrierInterface" type="Optaeo\Aeo\Model\ShippingCarrier"/>
+</config>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Optaeo_Aeo::aeo" title="OptAEO" sortOrder="100">
+                    <resource id="Optaeo_Aeo::reviews" title="OptAEO review summaries" sortOrder="10"/>
+                    <resource id="Optaeo_Aeo::shipping" title="OptAEO shipping config" sortOrder="20"/>
+                    <resource id="Optaeo_Aeo::webhooks" title="OptAEO webhook config" sortOrder="30"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

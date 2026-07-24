@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+  OptAEO reviews REST endpoint — fills core Magento's missing reviews REST. Read-only;
+  authorized by the OptAEO connector's OAuth1 Integration token (Optaeo_Aeo::reviews
+  ACL, covered by the integration's granted resources).
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/optaeo/reviews" method="GET">
+        <service class="Optaeo\Aeo\Api\ReviewSummaryManagementInterface" method="getList"/>
+        <resources>
+            <resource ref="Optaeo_Aeo::reviews"/>
+        </resources>
+    </route>
+    <route url="/V1/optaeo/reviews/:sku" method="GET">
+        <service class="Optaeo\Aeo\Api\ReviewSummaryManagementInterface" method="getBySku"/>
+        <resources>
+            <resource ref="Optaeo_Aeo::reviews"/>
+        </resources>
+    </route>
+    <route url="/V1/optaeo/webhook-config" method="PUT">
+        <service class="Optaeo\Aeo\Api\WebhookConfigManagementInterface" method="save"/>
+        <resources>
+            <resource ref="Optaeo_Aeo::webhooks"/>
+        </resources>
+    </route>
+    <route url="/V1/optaeo/shipping" method="GET">
+        <service class="Optaeo\Aeo\Api\ShippingConfigManagementInterface" method="getConfig"/>
+        <resources>
+            <resource ref="Optaeo_Aeo::shipping"/>
+        </resources>
+    </route>
+</routes>

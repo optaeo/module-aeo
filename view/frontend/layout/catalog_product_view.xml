@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+  Luma storefront rendering:
+  1. Inject the OptAEO authoritative schema.org Product JSON-LD into <head>
+     (head.additional — renders server-side, so AI crawlers see it with JS disabled).
+  2. Suppress Luma's native schema.org Product microdata so AI engines see exactly
+     ONE Product node (ours) — the "own the schema" strategy. The Product itemscope
+     and its name/sku/description itemprops are added via LAYOUT arguments
+     (catalog_product_view.xml in Magento_Catalog); we override those arguments to
+     empty. Pure layout — no template copy, no theme-breakage risk.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!-- Remove the <body> Product itemscope (Magento_Catalog sets it via the page
+         body <attribute> directive; override the values to empty so the body carries
+         no schema.org/Product node — engines see only our JSON-LD node below). -->
+    <body>
+        <attribute name="itemtype" value="" />
+        <attribute name="itemscope" value="" />
+        <referenceContainer name="head.additional">
+            <block class="Optaeo\Aeo\Block\ProductJsonLd" name="optaeo.product.jsonld" template="Optaeo_Aeo::product/jsonld.phtml"/>
+        </referenceContainer>
+
+        <!-- Remove the now-orphaned product itemprops (name / sku / description). -->
+        <referenceBlock name="page.main.title">
+            <arguments>
+                <argument name="add_base_attribute" xsi:type="string"></argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="product.info.sku">
+            <arguments>
+                <argument name="add_attribute" xsi:type="string"></argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="product.info.description">
+            <arguments>
+                <argument name="add_attribute" xsi:type="string"></argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

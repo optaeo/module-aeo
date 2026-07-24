@@ -1,0 +1,38 @@
+{
+    "name": "optaeo/module-aeo",
+    "description": "OptAEO — Agentic Engine Optimisation for Magento, Adobe Commerce and Mage-OS. Emits one authoritative schema.org Product JSON-LD node (with native-microdata suppression on Luma), serves catalogue-aware llms.txt + agents.txt at the store root, provisions the GTIN and descriptive product attributes, and exposes review-summary + shipping-config read APIs for AI shopping agents.",
+    "type": "magento2-module",
+    "license": "OSL-3.0",
+    "homepage": "https://optaeo.ai",
+    "authors": [
+        {
+            "name": "OptAEO",
+            "email": "support@optaeo.ai",
+            "homepage": "https://optaeo.ai"
+        }
+    ],
+    "keywords": [
+        "magento2",
+        "aeo",
+        "structured-data",
+        "llms-txt",
+        "agents-txt"
+    ],
+    "support": {
+        "email": "support@optaeo.ai",
+        "issues": "https://github.com/optaeo/module-aeo/issues",
+        "source": "https://github.com/optaeo/module-aeo"
+    },
+    "require": {
+        "php": ">=8.1",
+        "magento/framework": ">=103.0 <104"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Optaeo\\Aeo\\": ""
+        }
+    }
+}

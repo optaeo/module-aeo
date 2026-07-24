@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+  Register the OptAEO protocol router with the front controller's RouterList at
+  sortOrder 25 so it matches /llms.txt, /agents.txt, and /agents.md at the store
+  ROOT before the standard (30) / cms (60) routers turn them into a 404.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\App\RouterList">
+        <arguments>
+            <argument name="routerList" xsi:type="array">
+                <item name="optaeoProtocol" xsi:type="array">
+                    <item name="class" xsi:type="string">Optaeo\Aeo\Controller\Router\ProtocolRouter</item>
+                    <item name="disable" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="string">25</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- "Own the schema": strip native schema.org microdata from the render blocks
+         that emit it (the sources not removable via layout args), so engines see only
+         our authoritative JSON-LD Product node. This di.xml is theme-agnostic and
+         covers BOTH the Luma and Hyvä storefronts (one connector, shared module):
+           - Pricing\Render\Amount  : Luma's Offer microdata (price/priceCurrency).
+           - Catalog\Block\Product\Price : Hyvä's PDP price block — its theme template
+             (product/view/price.phtml) HARD-CODES an Offer itemscope + price/
+             priceCurrency/availability/priceValidUntil metas with no toggle, and a
+             module cannot override a theme template, so we strip at the block output.
+           - Review\Block\Product\ReviewRenderer : AggregateRating microdata (both).
+           - Catalog\Block\Product\View\Gallery : image itemprop microdata (Luma).
+           - Theme\Block\Html\Title : the product-name itemprop on the H1. On Luma the
+             empty add_base_attribute layout override (catalog_product_view.xml) clears
+             it, but Hyvä's theme layout re-sets add_base_attribute AFTER our module
+             layout (theme wins over module), so we strip it at the block output here.
+         The plugin removes ONLY microdata attributes (idempotent, early-returns when
+         the block emits none), so binding a class that renders no microdata on a given
+         theme is a safe no-op. -->
+    <type name="Magento\Framework\Pricing\Render\Amount">
+        <plugin name="optaeo_strip_offer_microdata" type="Optaeo\Aeo\Plugin\StripMicrodata"/>
+    </type>
+    <type name="Magento\Catalog\Block\Product\Price">
+        <plugin name="optaeo_strip_price_microdata" type="Optaeo\Aeo\Plugin\StripMicrodata"/>
+    </type>
+    <type name="Magento\Theme\Block\Html\Title">
+        <plugin name="optaeo_strip_title_microdata" type="Optaeo\Aeo\Plugin\StripMicrodata"/>
+    </type>
+    <type name="Magento\Review\Block\Product\ReviewRenderer">
+        <plugin name="optaeo_strip_review_microdata" type="Optaeo\Aeo\Plugin\StripMicrodata"/>
+    </type>
+    <!-- Hyvä server-renders the per-review list inline on the PDP (product/view/
+         list.phtml), each review carrying schema.org/Review + Rating + Person
+         microdata; Luma defers that list so it never appears there. Strip it so the
+         only review signal an engine sees is the aggregateRating in our JSON-LD. -->
+    <type name="Magento\Review\Block\Product\View">
+        <plugin name="optaeo_strip_reviewlist_microdata" type="Optaeo\Aeo\Plugin\StripMicrodata"/>
+    </type>
+    <type name="Magento\Catalog\Block\Product\View\Gallery">
+        <plugin name="optaeo_strip_gallery_microdata" type="Optaeo\Aeo\Plugin\StripMicrodata"/>
+    </type>
+</config>

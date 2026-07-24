@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+  OptAEO near-real-time change signal: fires for every product save (admin UI, REST
+  repository, import) — the observer POSTs { sku, store_host } to OptAEO's
+  /api/webhooks/magento, fire-and-forget (never blocks or fails the merchant's save).
+
+  catalog_product_save_after (NOT save_commit_after) — a deliberate, evidence-based
+  choice: commit_after's dispatch chain is fronted by core's magento_image_resize
+  observer, which THROWS whenever a product's media file is missing on disk; Magento's
+  commit-callback processor swallows that exception after logging it, silently
+  aborting every later observer on the event (verified live — our observer never
+  fired). save_after's chain (inventory / url_rewrite / media_content /
+  google_optimizer) completes reliably. save_after fires pre-commit, so the OptAEO
+  receiver waits a short settle delay before its re-pull (see
+  app/routes/api.webhooks.magento.tsx) — and a worst-case stale read is fail-soft:
+  the next save or scheduled full sync reconciles. Global area: REST saves don't run
+  in the frontend/adminhtml areas.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_after">
+        <observer name="optaeo_product_save_callback" instance="Optaeo\Aeo\Observer\ProductSaveObserver"/>
+    </event>
+</config>

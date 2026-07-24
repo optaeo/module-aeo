@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+  Frontend route 'optaeo' (frontName 'optaeo') so the protocol controllers resolve.
+  The public paths /llms.txt, /agents.txt, and /agents.md are mapped onto these
+  controllers at the STORE ROOT by the custom router in etc/frontend/di.xml
+  (RouterList), not by this frontName directly.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="standard">
+        <route id="optaeo" frontName="optaeo">
+            <module name="Optaeo_Aeo"/>
+        </route>
+    </router>
+</config>

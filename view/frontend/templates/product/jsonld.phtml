@@ -1,0 +1,12 @@
+<?php
+/**
+ * Renders the OptAEO authoritative schema.org Product JSON-LD into <head> on the
+ * Luma product view (injected at head.additional by catalog_product_view.xml).
+ *
+ * @var \Optaeo\Aeo\Block\ProductJsonLd $block
+ */
+$json = $block->getJsonLd();
+if ($json !== ''):
+    ?>
+<script type="application/ld+json"><?= /* @noEscape */ $json ?></script>
+<?php endif; ?>
