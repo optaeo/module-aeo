@@ -4,6 +4,14 @@
     <preference for="Optaeo\Aeo\Api\Data\ReviewSummaryInterface" type="Optaeo\Aeo\Model\ReviewSummary"/>
     <preference for="Optaeo\Aeo\Api\ShippingConfigManagementInterface" type="Optaeo\Aeo\Model\ShippingConfigManagement"/>
     <preference for="Optaeo\Aeo\Api\WebhookConfigManagementInterface" type="Optaeo\Aeo\Model\WebhookConfigManagement"/>
+    <preference for="Optaeo\Aeo\Api\Data\WebhookConfigInterface" type="Optaeo\Aeo\Model\WebhookConfig"/>
+    <preference for="Optaeo\Aeo\Api\ProtocolConfigManagementInterface" type="Optaeo\Aeo\Model\ProtocolConfigManagement"/>
     <preference for="Optaeo\Aeo\Api\Data\ShippingConfigInterface" type="Optaeo\Aeo\Model\ShippingConfig"/>
     <preference for="Optaeo\Aeo\Api\Data\ShippingCarrierInterface" type="Optaeo\Aeo\Model\ShippingCarrier"/>
+    <!-- Product-save callback delivery: real HTTP (cURL, waits for the answer) behind
+         one transport seam, and the PHP SAPI behind one runtime seam — both swappable
+         in unit tests. The dispatcher is a shared instance (Magento default) so every
+         save in a request queues into ONE post-response flush. -->
+    <preference for="Optaeo\Aeo\Model\Webhook\HttpTransportInterface" type="Optaeo\Aeo\Model\Webhook\CurlTransport"/>
+    <preference for="Optaeo\Aeo\Model\Webhook\RuntimeInterface" type="Optaeo\Aeo\Model\Webhook\PhpRuntime"/>
 </config>

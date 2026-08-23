@@ -21,6 +21,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use Optaeo\Aeo\Api\ShippingConfigManagementInterface;
 use Optaeo\Aeo\Model\ReviewSummarySource;
 
 class ProductJsonLd extends Template
@@ -29,6 +30,7 @@ class ProductJsonLd extends Template
         Context $context,
         private readonly Registry $registry,
         private readonly ReviewSummarySource $reviewSummarySource,
+        private readonly ShippingConfigManagementInterface $shippingConfigManagement,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -95,6 +97,22 @@ class ProductJsonLd extends Template
         ];
         if ($url !== '') {
             $offer['url'] = $url;
+        }
+        // OfferShippingDetails — store-truth shipping legibility for AI shopping agents,
+        // and served-node PARITY with the Shopify/Woo connectors (which enrich the Offer
+        // with the SAME shape from OptAEO's product_shipping_profile). The Magento module
+        // rebuilds the node server-side and has no channel to that table, so it composes
+        // the equivalent LIVE from the store's own shipping config — the very source
+        // OptAEO pulls to populate product_shipping_profile (main repo: lib/magento/
+        // shipping.ts). Honest omission throughout: emitted only when the store genuinely
+        // has shipping to represent; transit is ALWAYS absent (Magento core carries no
+        // EDD data — never fabricated); a free rate appears ONLY when free shipping is
+        // actually configured. This does NOT change the shipping-readiness SCORE (that
+        // reads product_shipping_profile, not the served node) — it closes the served
+        // store-truth gap so a crawler can answer "do you ship to X / is it free?".
+        $shippingDetails = $this->resolveShippingDetails();
+        if ($shippingDetails !== []) {
+            $offer['shippingDetails'] = $shippingDetails;
         }
         $data['offers'] = $offer;
 
@@ -206,6 +224,88 @@ class ProductJsonLd extends Template
         $text = strip_tags($value);
         $text = trim((string) preg_replace('/\s+/u', ' ', $text));
         return mb_substr($text, 0, $cap);
+    }
+
+    /**
+     * Cap on emitted OfferShippingDetails entries. Mirrors lib/magento/shipping.ts
+     * MAX_DESTINATIONS (25) so the served node never lists more destinations than the
+     * connector itself credits — and an oversized offer blob never gets truncated by a
+     * crawler.
+     */
+    private const SHIPPING_DEST_MAX = 25;
+
+    /**
+     * schema.org OfferShippingDetails[] composed from the LIVE store shipping config, or
+     * [] when there is genuinely nothing to represent (no destinations AND no free
+     * shipping, or the config read fails). Mirrors the connector's shape exactly
+     * (main repo: app/lib/remediation/engine.ts mergeShippingOfferDetailsIntoProductJsonLd):
+     *   - one entry per allowed destination country (DefinedRegion / addressCountry);
+     *   - NO deliveryTime — Magento core has no transit/EDD data, so we never fabricate it;
+     *   - shippingRate MonetaryAmount value 0 ONLY when free shipping is actually configured.
+     *
+     * Never throws (one config hiccup must not cost the whole node).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function resolveShippingDetails(): array
+    {
+        try {
+            $cfg = $this->shippingConfigManagement->getConfig();
+        } catch (\Throwable $e) {
+            return []; // config unreadable → honest omit, never break the node
+        }
+
+        $free = $cfg->getHasFreeShipping();
+        $carrierCount = $cfg->getCarrierCount();
+
+        // No carriers AND no free shipping ⇒ no shipping to represent (mirrors the
+        // connector writing 0 rows). Honest omission, not an empty node.
+        if ($carrierCount === 0 && !$free) {
+            return [];
+        }
+
+        $currency = trim((string) $cfg->getCurrency()) ?: 'USD';
+        $rate = $free
+            ? ['@type' => 'MonetaryAmount', 'value' => 0, 'currency' => $currency]
+            : null;
+
+        $countries = [];
+        foreach ($cfg->getAllowedCountries() as $c) {
+            $code = strtoupper(trim((string) $c));
+            if ($code === '') {
+                continue;
+            }
+            $countries[] = substr($code, 0, 2);
+            if (count($countries) >= self::SHIPPING_DEST_MAX) {
+                break;
+            }
+        }
+
+        // No enumerable destinations. If shipping is free, a single bare
+        // OfferShippingDetails (no destination = "ships broadly") is the honest
+        // representation — matching the connector's Rest-of-World handling. Otherwise
+        // there is nothing store-truthful to say.
+        if ($countries === []) {
+            return $rate !== null
+                ? [['@type' => 'OfferShippingDetails', 'shippingRate' => $rate]]
+                : [];
+        }
+
+        $details = [];
+        foreach ($countries as $code) {
+            $detail = [
+                '@type' => 'OfferShippingDetails',
+                'shippingDestination' => [
+                    '@type' => 'DefinedRegion',
+                    'addressCountry' => $code,
+                ],
+            ];
+            if ($rate !== null) {
+                $detail['shippingRate'] = $rate;
+            }
+            $details[] = $detail;
+        }
+        return $details;
     }
 
     /**

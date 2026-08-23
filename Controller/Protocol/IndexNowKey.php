@@ -6,20 +6,19 @@ namespace Optaeo\Aeo\Controller\Protocol;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\Raw;
 use Magento\Framework\Controller\Result\RawFactory;
-use Optaeo\Aeo\Model\ProtocolContent;
 use Optaeo\Aeo\Model\ProtocolSettings;
 
 /**
- * Serves the curated, catalogue-aware /llms.txt at the store root (text/plain) —
- * or an honest 404 when the merchant has switched llms.txt off in OptAEO (the
- * connector pushes that switch here; see ProtocolSettings), so the store never
- * serves a file OptAEO says is off.
+ * Hosts the IndexNow verification file at the store root: GET /<key>.txt returns
+ * the key as text/plain (the IndexNow ownership contract). The key is provisioned
+ * by the OptAEO connector (PUT /V1/optaeo/protocol-config); the root router only
+ * dispatches here when the requested filename equals the provisioned key, so no
+ * other /<anything>.txt path is ever answered by this controller.
  */
-class Llms implements HttpGetActionInterface
+class IndexNowKey implements HttpGetActionInterface
 {
     public function __construct(
         private readonly RawFactory $rawFactory,
-        private readonly ProtocolContent $protocolContent,
         private readonly ProtocolSettings $settings
     ) {
     }
@@ -29,12 +28,13 @@ class Llms implements HttpGetActionInterface
         /** @var Raw $result */
         $result = $this->rawFactory->create();
         $result->setHeader('Content-Type', 'text/plain; charset=utf-8', true);
-        if (!$this->settings->isLlmsTxtEnabled()) {
+        $key = $this->settings->getIndexNowKey();
+        if ($key === '') {
             $result->setHttpResponseCode(404);
-            $result->setContents("llms.txt is switched off for this store.\n");
+            $result->setContents("No IndexNow key is provisioned for this store.\n");
             return $result;
         }
-        $result->setContents($this->protocolContent->llmsTxt());
+        $result->setContents($key);
         return $result;
     }
 }

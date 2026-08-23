@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+  Default values for the OptAEO-provisioned switches (see Model/ProtocolSettings).
+  Both store-root files are ON by default — the behaviour every store had before the
+  switches existed — and no IndexNow key is hosted until the connector pushes one.
+  The observer callback config (optaeo/webhook/*) deliberately has NO default: an
+  empty callback URL is the shipped-disabled state until the connector provisions it.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <optaeo>
+            <protocol>
+                <llms_txt_enabled>1</llms_txt_enabled>
+                <agents_txt_enabled>1</agents_txt_enabled>
+                <indexnow_key></indexnow_key>
+            </protocol>
+        </optaeo>
+    </default>
+</config>

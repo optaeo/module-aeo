@@ -1,7 +1,7 @@
 <?php
 /**
- * Maps the ROOT paths /llms.txt, /agents.txt, and /agents.md onto the OptAEO
- * protocol controllers.
+ * Maps the ROOT paths /llms.txt, /agents.txt, /agents.md — and the provisioned
+ * IndexNow key file /<key>.txt — onto the OptAEO protocol controllers.
  * Magento frontNames live under a path segment (/optaeo/...); these protocol files
  * must serve at the bare store root, so a custom router resolves the matching
  * controller/action and returns the action instance DIRECTLY — the exact pattern
@@ -18,6 +18,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Route\ConfigInterface;
 use Magento\Framework\App\Router\ActionList;
 use Magento\Framework\App\RouterInterface;
+use Optaeo\Aeo\Model\ProtocolSettings;
 
 class ProtocolRouter implements RouterInterface
 {
@@ -34,7 +35,8 @@ class ProtocolRouter implements RouterInterface
     public function __construct(
         private readonly ActionFactory $actionFactory,
         private readonly ActionList $actionList,
-        private readonly ConfigInterface $routeConfig
+        private readonly ConfigInterface $routeConfig,
+        private readonly ProtocolSettings $settings
     ) {
     }
 
@@ -42,6 +44,14 @@ class ProtocolRouter implements RouterInterface
     {
         $identifier = trim((string) $request->getPathInfo(), '/');
         $action = self::ROUTES[$identifier] ?? null;
+        if ($action === null) {
+            // /<key>.txt — ONLY the exact provisioned IndexNow key, case-sensitive.
+            // Every other /<something>.txt falls through to the standard routers.
+            $key = $this->settings->getIndexNowKey();
+            if ($key !== '' && $identifier === $key . '.txt') {
+                $action = 'indexnowkey';
+            }
+        }
         if ($action === null) {
             return null;
         }

@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
 <!--
-  OptAEO reviews REST endpoint — fills core Magento's missing reviews REST. Read-only;
-  authorized by the OptAEO connector's OAuth1 Integration token (Optaeo_Aeo::reviews
-  ACL, covered by the integration's granted resources).
+  OptAEO REST endpoints — all authorized by the OptAEO connector's OAuth1 Integration
+  token through the module's ACL resources (granted when the merchant creates the
+  Integration with the OptAEO resources ticked):
+    - reviews  : fills core Magento's missing reviews REST (read-only).
+    - shipping : store-level shipping configuration (read-only).
+    - webhooks : connector-pushed configuration — the product-save callback config
+                 (PUT + read-back GET) and the protocol switches (PUT). One resource
+                 for every connector-pushed setting, so Integrations granted for an
+                 earlier module version keep working without a re-grant.
 -->
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <route url="/V1/optaeo/reviews" method="GET">
@@ -19,6 +25,18 @@
     </route>
     <route url="/V1/optaeo/webhook-config" method="PUT">
         <service class="Optaeo\Aeo\Api\WebhookConfigManagementInterface" method="save"/>
+        <resources>
+            <resource ref="Optaeo_Aeo::webhooks"/>
+        </resources>
+    </route>
+    <route url="/V1/optaeo/webhook-config" method="GET">
+        <service class="Optaeo\Aeo\Api\WebhookConfigManagementInterface" method="get"/>
+        <resources>
+            <resource ref="Optaeo_Aeo::webhooks"/>
+        </resources>
+    </route>
+    <route url="/V1/optaeo/protocol-config" method="PUT">
+        <service class="Optaeo\Aeo\Api\ProtocolConfigManagementInterface" method="save"/>
         <resources>
             <resource ref="Optaeo_Aeo::webhooks"/>
         </resources>
