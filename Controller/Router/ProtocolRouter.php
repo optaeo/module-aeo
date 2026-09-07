@@ -1,7 +1,7 @@
 <?php
 /**
- * Maps the ROOT paths /llms.txt, /agents.txt, /agents.md — and the provisioned
- * IndexNow key file /<key>.txt — onto the OptAEO protocol controllers.
+ * Maps the ROOT paths /llms.txt, /agents.txt, /agents.md, /sitemap.xml — and the
+ * provisioned IndexNow key file /<key>.txt — onto the OptAEO protocol controllers.
  * Magento frontNames live under a path segment (/optaeo/...); these protocol files
  * must serve at the bare store root, so a custom router resolves the matching
  * controller/action and returns the action instance DIRECTLY — the exact pattern
@@ -30,6 +30,7 @@ class ProtocolRouter implements RouterInterface
         // discovery-document alias for platforms that already link to it.
         'agents.txt' => 'agents',
         'agents.md' => 'agents',
+        'sitemap.xml' => 'sitemap',
     ];
 
     public function __construct(
@@ -44,6 +45,9 @@ class ProtocolRouter implements RouterInterface
     {
         $identifier = trim((string) $request->getPathInfo(), '/');
         $action = self::ROUTES[$identifier] ?? null;
+        if ($action === null && preg_match('/^sitemap-[1-9][0-9]*\.xml$/D', $identifier) === 1) {
+            $action = 'sitemap';
+        }
         if ($action === null) {
             // /<key>.txt — ONLY the exact provisioned IndexNow key, case-sensitive.
             // Every other /<something>.txt falls through to the standard routers.

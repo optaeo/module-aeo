@@ -9,6 +9,19 @@ was a pre-publication release candidate that never reached Packagist. The histor
 below is kept as it happened rather than renumbered, so the 1.1.0 entry continues
 to describe exactly what shipped in it.
 
+## 1.3.0
+
+### Added
+
+- Module support for `GET /sitemap.xml` at the store root, generated read-only
+  from the complete live enabled-and-visible catalogue truth. Output streams in
+  bounded batches, uses a sitemap index above 50,000 URLs, XML-escapes and
+  de-duplicates each document, skips XML-illegal URLs, and aborts visibly if a
+  catalogue row read fails rather than returning a successful truncated
+  document. Base-URL validation and both catalogue counts complete before XML
+  headers are sent; failure at request start returns `503 text/plain` instead
+  of a false-success sitemap response.
+
 ## 1.2.0
 
 ### Fixed
