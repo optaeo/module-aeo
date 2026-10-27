@@ -6,6 +6,14 @@
     <preference for="Optaeo\Aeo\Api\WebhookConfigManagementInterface" type="Optaeo\Aeo\Model\WebhookConfigManagement"/>
     <preference for="Optaeo\Aeo\Api\Data\WebhookConfigInterface" type="Optaeo\Aeo\Model\WebhookConfig"/>
     <preference for="Optaeo\Aeo\Api\ProtocolConfigManagementInterface" type="Optaeo\Aeo\Model\ProtocolConfigManagement"/>
+    <preference for="Optaeo\Aeo\Api\FaqRestorationManagementInterface" type="Optaeo\Aeo\Model\FaqRestorationManagement"/>
+    <preference for="Optaeo\Aeo\Api\Data\FaqRestorationInterface" type="Optaeo\Aeo\Model\FaqRestoration"/>
+    <type name="Magento\Catalog\Model\ResourceModel\Product">
+        <plugin name="optaeo_faq_save_intent" type="Optaeo\Aeo\Plugin\FaqSaveIntent" sortOrder="10"/>
+    </type>
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Action">
+        <plugin name="optaeo_faq_attribute_intent" type="Optaeo\Aeo\Plugin\FaqAttributeIntent" sortOrder="10"/>
+    </type>
     <preference for="Optaeo\Aeo\Api\Data\ShippingConfigInterface" type="Optaeo\Aeo\Model\ShippingConfig"/>
     <preference for="Optaeo\Aeo\Api\Data\ShippingCarrierInterface" type="Optaeo\Aeo\Model\ShippingCarrier"/>
     <!-- Product-save callback delivery: real HTTP (cURL, waits for the answer) behind
