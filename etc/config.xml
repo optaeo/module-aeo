@@ -10,6 +10,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <optaeo>
+            <restoration><enabled>1</enabled></restoration>
             <protocol>
                 <llms_txt_enabled>1</llms_txt_enabled>
                 <agents_txt_enabled>1</agents_txt_enabled>

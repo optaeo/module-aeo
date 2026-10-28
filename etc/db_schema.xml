@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="optaeo_faq_restoration_intent" resource="default" engine="innodb" comment="OptAEO Explicit FAQ Removal Intent">
+        <!-- Logical entity_id works for both Open Source entity_id and Commerce row_id EAV layouts. -->
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" comment="Logical Product ID"/>
+        <column xsi:type="smallint" name="disabled" unsigned="true" nullable="false" default="1" comment="Explicit FAQ Removal"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+</schema>
