@@ -42,6 +42,8 @@ service requires an OptAEO account and an active subscription where applicable.
 - Magento Open Source / Adobe Commerce / Mage-OS **2.4.4 or newer**
 - PHP **8.1+**
 
+_Verified on Mage-OS 3.0.0 (Magento 2.4.9), PHP 8.4. Built to the 2.4.4+ module API; other versions in that range are supported but not yet individually tested._
+
 ## Install
 
 ```bash
@@ -77,8 +79,8 @@ vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist vendor/optaeo/module-aeo/T
 
 ## Storefront support
 
-Verified on **Luma**: the module suppresses native product microdata so only the
-OptAEO JSON-LD node remains. The Hyvä implementation is built to the theme's
+Verified on **Luma (Mage-OS 2.4.9)**: the module suppresses native product microdata
+so only the OptAEO JSON-LD node remains. The Hyvä implementation is built to the theme's
 integration contract but awaits verification on a licensed Hyvä store.
 
 ## Support
